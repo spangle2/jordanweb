@@ -12,6 +12,8 @@ background-color: #85ace7;
 margin: 0;
 padding: 0;
 color: #333;
+position: relative;
+overflow-x: hidden;
 }
 
 .container {
@@ -19,6 +21,8 @@ width: 80%;
 max-width: 1200px;
 margin: 0 auto;
 padding: 20px;
+position: relative;
+z-index: 1;
 }
 
 header {
@@ -137,9 +141,39 @@ margin-top: 30px;
 color: #666;
 font-size: 0.9em;
 }
+
+/* Floating images styles */
+.floating-image {
+position: absolute;
+z-index: 0;
+opacity: 0.7;
+transition: transform 0.5s ease-out;
+pointer-events: none; /* Makes images non-interactive so they don't interfere with clicks */
+}
+
+.floating-image img {
+width: 100%;
+height: 100%;
+object-fit: contain;
+}
+
+@keyframes float {
+0% {
+transform: translateY(0) rotate(0deg);
+}
+50% {
+transform: translateY(-20px) rotate(5deg);
+}
+100% {
+transform: translateY(0) rotate(0deg);
+}
+}
 </style>
 </head>
 <body>
+<!-- Floating images container - will be populated by JavaScript -->
+<div id="floating-images-container"></div>
+
 <header>
 <div class="container">
 <h1>jordans website</h1>
@@ -197,6 +231,7 @@ font-size: 0.9em;
 </footer>
 
 <script>
+// Time and date update function
 function updateDateTime() {
 const now = new Date();
 
@@ -225,6 +260,99 @@ document.getElementById('current-date').textContent = now.toLocaleDateString('en
 // Update time immediately and then every second
 updateDateTime();
 setInterval(updateDateTime, 1000);
+
+// Floating images functionality
+document.addEventListener('DOMContentLoaded', function() {
+const container = document.getElementById('floating-images-container');
+const imageUrls = ['1.png', '2.png', '3.png'];
+const numberOfImages = 15; // Total number of floating images
+
+// Create the specified number of floating images
+for (let i = 0; i < numberOfImages; i++) {
+// Randomly select an image
+const randomImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+
+// Create image element
+const imgElement = document.createElement('img');
+imgElement.src = randomImageUrl;
+imgElement.alt = 'Floating image';
+
+// Create container div for the image
+const floatingElement = document.createElement('div');
+floatingElement.className = 'floating-image';
+floatingElement.appendChild(imgElement);
+
+// Set random size (between 30px and 100px)
+const size = Math.random() * 70 + 30;
+floatingElement.style.width = `${size}px`;
+floatingElement.style.height = `${size}px`;
+
+// Set random initial position
+const posX = Math.random() * window.innerWidth;
+const posY = Math.random() * document.body.scrollHeight;
+floatingElement.style.left = `${posX}px`;
+floatingElement.style.top = `${posY}px`;
+
+// Set random animation duration and delay
+const animDuration = Math.random() * 10 + 5; // 5-15 seconds
+const animDelay = Math.random() * 5; // 0-5 seconds
+floatingElement.style.animation = `float ${animDuration}s ease-in-out ${animDelay}s infinite`;
+
+// Add rotation for more dynamic movement
+floatingElement.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+// Add to container
+container.appendChild(floatingElement);
+}
+
+// Function to move images around randomly
+function moveImages() {
+const floatingImages = document.querySelectorAll('.floating-image');
+
+floatingImages.forEach(img => {
+// Get current position
+const currentX = parseFloat(img.style.left);
+const currentY = parseFloat(img.style.top);
+
+// Generate random movement (between -50 and 50 pixels)
+const moveX = (Math.random() - 0.5) * 100;
+const moveY = (Math.random() - 0.5) * 100;
+
+// Calculate new position with boundaries
+let newX = currentX + moveX;
+let newY = currentY + moveY;
+
+// Keep images within viewport
+newX = Math.max(0, Math.min(newX, window.innerWidth - 100));
+newY = Math.max(0, Math.min(newY, document.body.scrollHeight - 100));
+
+// Apply new position with smooth transition
+img.style.transition = 'left 8s, top 8s';
+img.style.left = `${newX}px`;
+img.style.top = `${newY}px`;
+
+// Random rotation
+const rotation = Math.random() * 360;
+img.style.transform = `rotate(${rotation}deg)`;
+});
+}
+
+// Move images periodically
+setInterval(moveImages, 8000);
+
+// Handle window resize
+window.addEventListener('resize', function() {
+const floatingImages = document.querySelectorAll('.floating-image');
+floatingImages.forEach(img => {
+// Make sure images stay within the new viewport size
+const currentX = parseFloat(img.style.left);
+const currentY = parseFloat(img.style.top);
+
+img.style.left = `${Math.min(currentX, window.innerWidth - 100)}px`;
+img.style.top = `${Math.min(currentY, document.body.scrollHeight - 100)}px`;
+});
+});
+});
 </script>
 </body>
 </html>
