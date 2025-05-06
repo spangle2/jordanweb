@@ -212,14 +212,60 @@ transform: translateY(-20px) rotate(5deg);
 transform: translateY(0) rotate(0deg);
 }
 }
+
+/* Video overlay styles */
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: black;
+    display: none;
+}
+
+.video-overlay video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Bouncing video styles */
+.bouncing-video-container {
+    position: fixed;
+    z-index: 1000;
+    display: none;
+}
+
+.bouncing-video {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
 </style>
 </head>
 <body>
+<!-- Video overlay container -->
+<div class="video-overlay" id="videoOverlay">
+    <video id="randomVideo" src="vid.mp4"></video>
+</div>
+
+<!-- Bouncing video container -->
+<div class="bouncing-video-container" id="bouncingVideoContainer">
+    <video id="bouncingVideo" class="bouncing-video" src="vid2.mp4"></video>
+</div>
+
 <!-- Floating images container - will be populated by JavaScript -->
 <div id="floating-images-container"></div>
 
 <!-- Cat animation containers -->
 <div id="cat-containers"></div>
+
+<!-- Audio element for sound -->
+<audio id="randomSound" src="sound.mp3"></audio>
 
 <header>
 <div class="container">
@@ -306,6 +352,120 @@ transform: translateY(0) rotate(0deg);
 </footer>
 
 <script>
+// Audio play functionality
+const audioElement = document.getElementById('randomSound');
+let isPlaying = false;
+let soundChance = 0.01; // Adjust this value to change the chance (0.01 = 1% chance)
+
+// Function to randomly play sound
+function tryPlaySound() {
+    if (!isPlaying && Math.random() < soundChance) {
+        isPlaying = true;
+        audioElement.volume = 1.0; // Full volume
+        audioElement.play();
+        
+        // Reset the isPlaying flag when audio finishes
+        audioElement.onended = function() {
+            isPlaying = false;
+        };
+    }
+}
+
+// Check every few seconds if sound should play
+setInterval(tryPlaySound, 5000);
+
+// Video play functionality
+const videoOverlay = document.getElementById('videoOverlay');
+const videoElement = document.getElementById('randomVideo');
+let isVideoPlaying = false;
+let videoChance = 0.01; // Adjust this value to change the chance (0.01 = 1% chance)
+
+// Function to randomly play video
+function tryPlayVideo() {
+    if (!isVideoPlaying && !isBouncingVideoPlaying && Math.random() < videoChance) {
+        isVideoPlaying = true;
+        videoOverlay.style.display = 'block';
+        videoElement.play();
+        
+        // Hide overlay and reset flag when video ends
+        videoElement.onended = function() {
+            videoOverlay.style.display = 'none';
+            isVideoPlaying = false;
+        };
+    }
+}
+
+// Check every few seconds if video should play
+setInterval(tryPlayVideo, 8000);
+
+// Bouncing video functionality
+const bouncingVideoContainer = document.getElementById('bouncingVideoContainer');
+const bouncingVideoElement = document.getElementById('bouncingVideo');
+let isBouncingVideoPlaying = false;
+let bouncingVideoChance = 0.01; // Adjust this value to change the chance (0.01 = 1% chance)
+let bouncingX = 1;
+let bouncingY = 1;
+let posX = 100;
+let posY = 100;
+let bouncingInterval;
+
+// Function to move the bouncing video
+function moveBouncingVideo() {
+    // Get window dimensions accounting for video size
+    const maxX = window.innerWidth - bouncingVideoElement.offsetWidth;
+    const maxY = window.innerHeight - bouncingVideoElement.offsetHeight;
+    
+    // Calculate new position
+    posX += bouncingX * 5;
+    posY += bouncingY * 5;
+    
+    // Bounce off edges
+    if (posX <= 0 || posX >= maxX) {
+        bouncingX *= -1;
+    }
+    if (posY <= 0 || posY >= maxY) {
+        bouncingY *= -1;
+    }
+    
+    // Apply new position
+    bouncingVideoContainer.style.left = posX + 'px';
+    bouncingVideoContainer.style.top = posY + 'px';
+}
+
+// Function to randomly play bouncing video
+function tryPlayBouncingVideo() {
+    if (!isBouncingVideoPlaying && !isVideoPlaying && Math.random() < bouncingVideoChance) {
+        isBouncingVideoPlaying = true;
+        
+        // Set random initial position
+        posX = Math.random() * (window.innerWidth - 300);
+        posY = Math.random() * (window.innerHeight - 200);
+        bouncingVideoContainer.style.left = posX + 'px';
+        bouncingVideoContainer.style.top = posY + 'px';
+        
+        // Set random direction
+        bouncingX = Math.random() > 0.5 ? 1 : -1;
+        bouncingY = Math.random() > 0.5 ? 1 : -1;
+        
+        // Show and play
+        bouncingVideoContainer.style.display = 'block';
+        bouncingVideoElement.play();
+        
+        // Start bouncing animation
+        bouncingInterval = setInterval(moveBouncingVideo, 30);
+        
+        // Hide and reset when video ends
+        bouncingVideoElement.onended = function() {
+            bouncingVideoContainer.style.display = 'none';
+            isBouncingVideoPlaying = false;
+            clearInterval(bouncingInterval);
+        };
+    }
+}
+
+// Check every few seconds if bouncing video should play
+setInterval(tryPlayBouncingVideo, 10000);
+
 // Time and date update function for PDT
 function updateDateTime() {
 const now = new Date();
