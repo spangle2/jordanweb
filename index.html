@@ -164,6 +164,101 @@ font-size: 1.8em;
 color: #e74c3c;
 }
 
+/* Spotify embed styling */
+.spotify-embed {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    border-left: 4px solid #1DB954; /* Spotify green */
+}
+
+.spotify-embed h4 {
+    margin-top: 0;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.spotify-embed iframe {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+.spotify-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.song-message {
+    background-color: #ffe1e1;
+    border-left: 4px solid #ff5c5c;
+    padding: 10px 15px;
+    border-radius: 0 5px 5px 0;
+    font-size: 0.9em;
+    font-style: italic;
+    color: #222;
+}
+
+.song-message p {
+    margin: 0;
+}
+
+/* Social links styling */
+.social-links {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    border-left: 4px solid #6e5494; /* GitHub purple */
+}
+
+.social-links h4 {
+    margin-top: 0;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    background-color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.social-icon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+}
+
+.social-icon img {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+.social-icon.github:hover {
+    background-color: #f0f0f0;
+    color: #24292e;
+}
+
+.social-icon.itch:hover {
+    background-color: #fa5c5c;
+    color: white;
+}
+
 footer {
 text-align: center;
 padding: 20px;
@@ -245,6 +340,149 @@ transform: translateY(0) rotate(0deg);
     border: 3px solid white;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
+
+/* Creepy image styles */
+.creepy-container {
+    position: fixed;
+    z-index: 999;
+    display: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.creepy-image {
+    max-height: 70vh;
+    width: auto;
+    filter: contrast(1.2) brightness(0.8) saturate(1.3);
+    animation: shake 0.1s linear infinite;
+}
+
+.creepy-text {
+    font-family: 'Courier New', monospace;
+    color: #ff0000;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7), -2px -2px 4px rgba(0,0,0,0.7);
+    font-size: 24px;
+    margin-top: 10px;
+    max-width: 300px;
+    font-weight: bold;
+    animation: glitch 0.3s infinite;
+}
+
+@keyframes shake {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(1px, 1px) rotate(0.5deg); }
+    50% { transform: translate(-1px, -1px) rotate(-0.5deg); }
+    75% { transform: translate(2px, -1px) rotate(0.5deg); }
+    100% { transform: translate(-1px, 1px) rotate(-0.5deg); }
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.7), -2px -2px 4px rgba(0,0,0,0.7);
+    }
+    25% {
+        text-shadow: -2px 0 red, 2px 0 blue;
+    }
+    50% {
+        text-shadow: 2px 0 red, -2px 0 blue;
+        transform: translate(1px, 1px);
+    }
+    75% {
+        text-shadow: -2px 0 blue, 2px 0 red;
+        transform: translate(-1px, 0);
+    }
+    100% {
+        transform: translate(0);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.7), -2px -2px 4px rgba(0,0,0,0.7);
+    }
+}
+
+/* Page disruption styles */
+.disrupted {
+    animation: disrupt 0.3s ease-in-out !important;
+    filter: hue-rotate(180deg) invert(10%) !important;
+}
+
+@keyframes disrupt {
+    0% { transform: skewX(0deg) skewY(0deg); }
+    25% { transform: skewX(3deg) skewY(0deg); }
+    50% { transform: skewX(0deg) skewY(-3deg); }
+    75% { transform: skewX(-2deg) skewY(1deg); }
+    100% { transform: skewX(0deg) skewY(0deg); }
+}
+
+/* Jumpscare effect */
+.jumpscare {
+    animation: jumpscare 0.15s linear;
+    z-index: 1500 !important;
+}
+
+@keyframes jumpscare {
+    0% { transform: scale(0.1); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Mega jumpscare effect */
+.mega-jumpscare {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    animation: mega-jumpscare 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+
+.mega-jumpscare .creepy-image {
+    max-height: 80vh !important;
+    max-width: 90vw !important;
+    filter: contrast(1.5) brightness(0.7) saturate(1.5) hue-rotate(10deg) !important;
+    animation: shake 0.05s linear infinite !important;
+}
+
+.mega-jumpscare .creepy-text {
+    font-size: 3rem !important;
+    max-width: 90vw !important;
+    text-align: center !important;
+}
+
+.permission-requests {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.permission-request {
+    background-color: #ff3333;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: bold;
+    animation: request-pulse 1s infinite alternate;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+}
+
+@keyframes request-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+    100% { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); }
+}
+
+@keyframes mega-jumpscare {
+    0% { transform: scale(0.1); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
 </style>
 </head>
 <body>
@@ -256,6 +494,12 @@ transform: translateY(0) rotate(0deg);
 <!-- Bouncing video container -->
 <div class="bouncing-video-container" id="bouncingVideoContainer">
     <video id="bouncingVideo" class="bouncing-video" src="vid2.mp4"></video>
+</div>
+
+<!-- Creepy image container -->
+<div class="creepy-container" id="creepyContainer">
+    <img id="creepyImage" class="creepy-image" src="diaimg.png" alt="Creepy">
+    <div id="creepyText" class="creepy-text"></div>
 </div>
 
 <!-- Floating images container - will be populated by JavaScript -->
@@ -313,6 +557,47 @@ transform: translateY(0) rotate(0deg);
 <h3>About Me</h3>
 <p>i dont know .</p>
 <p>this is a website >
+
+<!-- Social Links -->
+<div class="social-links">
+    <h4>Find Me Online</h4>
+    <div class="social-icons">
+        <a href="https://github.com/spangle2" target="_blank" class="social-icon github">
+            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub">
+            <span>GitHub</span>
+        </a>
+        <a href="https://spangle2.itch.io" target="_blank" class="social-icon itch">
+            <img src="https://static.itch.io/images/app-icon.svg" alt="Itch.io">
+            <span>Itch.io</span>
+        </a>
+    </div>
+</div>
+
+<!-- Spotify Favorite Song Embed -->
+<div class="spotify-embed">
+    <h4>My Favorite Song</h4>
+    <div class="spotify-container">
+        <iframe id="spotify-frame" style="border-radius:12px" src="https://open.spotify.com/embed/track/3gVhsZtseYtY1fMuyYq06F?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <div class="song-message">
+            <p>i dont care if you like a different genre, i like this song and you cant change it</p>
+        </div>
+    </div>
+    
+    <!-- 
+    INSTRUCTIONS TO CHANGE THE SONG:
+    
+    1. Go to your favorite song on Spotify
+    2. Right-click the song > Share > Copy Song Link
+    3. The link will look like: https://open.spotify.com/track/3gVhsZtseYtY1fMuyYq06F
+    4. Copy the ID part (after /track/): 3gVhsZtseYtY1fMuyYq06F
+    5. Replace the ID in the iframe src above
+    
+    EXAMPLES:
+    - Billie Eilish - bad guy: 2Fxmhks0bxGSBdJ92vM42m
+    - Drake - God's Plan: 6DCZcSspjsKoFjzjrWoCdn
+    - Rick Astley - Never Gonna Give You Up: 4cOdK2wGLETKBW3PvgPWqT
+    -->
+</div>
 </section>
 
 <section class="websites-section">
@@ -348,10 +633,29 @@ transform: translateY(0) rotate(0deg);
 <footer>
 <div class="container">
 <p>© 2025 Jordan. All rights reserved.</p>
+
+<!-- Random Number Generator -->
+<div id="random-number-generator">
+    <span>Random Number (1-25): </span>
+    <span id="random-number">-</span>
+    <button onclick="generateRandomNumber()">Generate</button>
+</div>
 </div>
 </footer>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Force refresh the Spotify embed when the page loads
+    const spotifyFrame = document.getElementById('spotify-frame');
+    if (spotifyFrame) {
+        const originalSrc = spotifyFrame.src;
+        spotifyFrame.src = '';
+        setTimeout(() => {
+            spotifyFrame.src = originalSrc;
+        }, 100);
+    }
+});
+
 // Audio play functionality
 const audioElement = document.getElementById('randomSound');
 let isPlaying = false;
@@ -465,6 +769,358 @@ function tryPlayBouncingVideo() {
 
 // Check every few seconds if bouncing video should play
 setInterval(tryPlayBouncingVideo, 10000);
+
+// Creepy image functionality
+const creepyContainer = document.getElementById('creepyContainer');
+const creepyText = document.getElementById('creepyText');
+const creepyImage = document.getElementById('creepyImage');
+let isCreepyShowing = false;
+let creepyChance = 0.1; // Normal chance (10% chance for creepy image to appear)
+let isMoving = false;
+let moveInterval;
+let disruptInterval;
+let isMegaJumpscareActive = false;
+
+// Array of creepy messages
+const creepyMessages = [
+    "̴S̷c̵r̷e̵a̸m̴ ̸l̴o̵u̶d̸e̷r̵.̴ ̴I̵ ̸f̴e̷e̸d̸ ̷o̷n̵ ̴i̷t̷.̶",
+    "̶B̷e̶g̴g̸i̷n̴g̶ ̸a̸l̶r̶e̵a̶d̸y̷?̶ ̷W̷e̴a̶k̸.̶",
+    "̴I̷ ̸l̵o̶v̷e̷ ̴w̸a̶t̸c̷h̴i̷n̷g̵ ̵h̷o̸p̴e̵ ̸d̷i̶e̸.̷",
+    "̷O̴o̵p̴s̶!̷ ̵D̷i̶d̶ ̵I̸ ̷b̸r̷e̴a̸k̸ ̸y̷o̴u̴r̷ ̴r̵e̷a̵l̶i̷t̷y̴?̶",
+    "̵P̷a̴i̷n̷ ̵b̴u̸i̴l̵d̸s̴ ̶c̶h̵a̸r̵a̶c̵t̷e̴r̸.̸ ̶Y̶o̷u̴'̵r̴e̶ ̸w̶e̶l̴c̴o̷m̶e̴.̴",
+    "̴G̶o̷ ̴a̵h̷e̴a̵d̵.̸ ̷R̵u̶n̷.̸ ̴I̸t̶'̷s̴ ̶a̸d̵o̷r̷a̷b̵l̸e̷.̶",
+    "̷Y̸o̶u̸r̷ ̷f̶e̸a̸r̴ ̶s̶m̶e̷l̶l̸s̷ ̸d̸e̷l̷i̸c̴i̸o̴u̸s̸.̷",
+    "̵T̸i̶c̸k̸ ̴t̶o̸c̷k̷.̸ ̸S̸a̶n̷i̴t̶y̵'̴s̸ ̵m̷e̸l̷t̵i̶n̸g̶.̶",
+    "I̸'̸M̴ ̸I̶N̴S̸I̷D̶E̸ ̴Y̵O̵U̸R̵ ̶S̵C̷R̴E̶E̵N̸",
+    "D̶O̴N̸'̴T̵ ̸L̸O̴O̷K̵ ̴B̴E̷H̵I̴N̷D̶ ̸Y̷O̵U̸",
+    "I̵ ̶S̴E̷E̴ ̸Y̵O̶U̴ ̶W̶H̷E̵N̸ ̷Y̴O̵U̷ ̴S̸L̷E̷E̵P̵"
+];
+
+// Extreme jumpscare messages
+const megaJumpscareMessages = [
+    "G̷̪̓I̸̡̯̔V̶̪̀E̷̗͐ ̶̡̖̎̓M̵̘̩͋Ë̸̞́̔ ̴̥̖͒̒A̶̭̔C̵̱͘C̴̩̝̔͝E̴̢̛͚̅S̴̞̙̓S̴̜̊̅ ̸̠̽̎T̵̬͑O̵̡̬̿̚ ̸̲̠̂Y̶̺̝̆͝O̴̜̾U̵̱̎R̴͓̮̒ ̸̦̬͝M̶̙̬̂͋I̵̻̯͛̓C̵̦̪̑R̸̰̯̔O̵̱͔̔P̵̧̭̏̐Ḧ̸̩̭́Ọ̵͑̆N̵͙̙̋Ḙ̸̄͂",
+    "Ã̸̘L̵̞̗̔L̸̲̈́O̴̡̥͋Ẁ̶̜͂ ̶̨̪̀̕M̷̰͚̒̋Ỳ̵̝̞̉ ̶̡͙̅L̵̙̎̓Ò̶͔C̸̫͊A̴̱̤̓̃T̴̢̛I̸̳̓O̶͖̾͝N̶̨̟̈́͘ ̶̥̅̒T̸̠̫̒̂O̸̻̫̍͆ ̵̝͙̽F̸̯̀I̵̧̊Ń̵̹̣̔D̶̲̾͝ ̵̺̅Y̵̫̟̓O̴̘͕̿U̴̺̅",
+    "I̴̪̒ ̸̬̒͂Ń̴̨͓Ẹ̶̔E̷̳̚D̵̢̈ ̵̺͔͛Y̵͙͆Ö̴̹́͊Ų̵̤͐̿R̷̯̫̔ ̵̭͖͊P̸̗̓Ě̷̜R̴̠͑M̴̰̏͝I̸̠̍̏S̶̰̣͑S̴̪͙̈́I̵̹͑͒Ǫ̴̘̃Ň̶̫͐S̵̳̓ ̸̟̾T̸̺̓̚Ö̸̻́ ̵̲̎͝S̷̺̍P̴̦̆̿R̴͉̊͂Ē̷͙A̴̙̹̓͘D̵̮͉̋"
+];
+
+// Permission buttons text
+const permissionButtons = [
+    "Allow Microphone",
+    "Enable Camera",
+    "Share Location",
+    "Grant Notifications",
+    "Allow Full Access",
+    "Enable Background Access",
+    "Allow System Control"
+];
+
+// Function to create mega jumpscare
+function createMegaJumpscare() {
+    // Don't create if already active
+    if (isMegaJumpscareActive) return;
+    isMegaJumpscareActive = true;
+    
+    // Create mega jumpscare elements
+    creepyContainer.classList.add('mega-jumpscare');
+    
+    // Set mega jumpscare message
+    const megaMessage = megaJumpscareMessages[Math.floor(Math.random() * megaJumpscareMessages.length)];
+    creepyText.textContent = megaMessage;
+    
+    // Create permission requests
+    const permissionRequestsDiv = document.createElement('div');
+    permissionRequestsDiv.className = 'permission-requests';
+    
+    // Add random number of permission buttons (3-5)
+    const numButtons = 3 + Math.floor(Math.random() * 3);
+    
+    // Shuffle array to get random buttons
+    const shuffledButtons = [...permissionButtons].sort(() => Math.random() - 0.5);
+    
+    for (let i = 0; i < numButtons; i++) {
+        const button = document.createElement('button');
+        button.className = 'permission-request';
+        button.textContent = shuffledButtons[i];
+        
+        // Add fake click handler that removes the button but keeps the jumpscare
+        button.addEventListener('click', function() {
+            this.style.backgroundColor = '#00cc00';
+            this.textContent = 'Access Granted';
+            setTimeout(() => {
+                this.remove();
+                // If all buttons removed, close mega jumpscare after delay
+                if (permissionRequestsDiv.children.length === 0) {
+                    setTimeout(() => closeMegaJumpscare(), 2000);
+                }
+            }, 1000);
+        });
+        
+        permissionRequestsDiv.appendChild(button);
+    }
+    
+    // Add close button
+    const closeButton = document.createElement('button');
+    closeButton.className = 'permission-request';
+    closeButton.textContent = 'Close';
+    closeButton.style.backgroundColor = '#333';
+    closeButton.addEventListener('click', closeMegaJumpscare);
+    permissionRequestsDiv.appendChild(closeButton);
+    
+    // Add to container
+    creepyContainer.appendChild(permissionRequestsDiv);
+    
+    // Disrupt page elements aggressively
+    disruptPageAggressively();
+    
+    // Set timeout to automatically close mega jumpscare
+    setTimeout(closeMegaJumpscare, 15000);
+}
+
+// Function to close mega jumpscare
+function closeMegaJumpscare() {
+    if (!isMegaJumpscareActive) return;
+    
+    // Remove permission requests div
+    const permissionRequestsDiv = document.querySelector('.permission-requests');
+    if (permissionRequestsDiv) {
+        permissionRequestsDiv.remove();
+    }
+    
+    // Remove mega jumpscare class
+    creepyContainer.classList.remove('mega-jumpscare');
+    
+    // Reset flags
+    isMegaJumpscareActive = false;
+    isCreepyShowing = false;
+    
+    // Hide container
+    creepyContainer.style.opacity = '0';
+    setTimeout(() => {
+        creepyContainer.style.display = 'none';
+        
+        // Clear intervals if they were set
+        if (moveInterval) {
+            clearInterval(moveInterval);
+            moveInterval = null;
+        }
+        
+        if (disruptInterval) {
+            clearInterval(disruptInterval);
+            disruptInterval = null;
+        }
+    }, 500);
+}
+
+// Function to disrupt page elements aggressively
+function disruptPageAggressively() {
+    // Get all major elements
+    const allElements = document.querySelectorAll('section, div.container, header, p, h1, h2, h3, h4, img');
+    
+    // Apply extreme effects to random elements
+    allElements.forEach(el => {
+        if (Math.random() < 0.7) { // 70% chance for each element
+            el.classList.add('disrupted');
+            
+            // Add extra effects
+            const effect = Math.floor(Math.random() * 5);
+            switch(effect) {
+                case 0:
+                    el.style.transform = `rotate(${(Math.random() - 0.5) * 10}deg)`;
+                    break;
+                case 1:
+                    el.style.filter = 'invert(100%) hue-rotate(180deg)';
+                    break;
+                case 2:
+                    el.style.opacity = '0.5';
+                    break;
+                case 3:
+                    el.style.transform = `skew(${(Math.random() - 0.5) * 20}deg, ${(Math.random() - 0.5) * 20}deg)`;
+                    break;
+                case 4:
+                    el.style.animation = 'shake 0.1s infinite';
+                    break;
+            }
+            
+            // Remove effects after random time
+            setTimeout(() => {
+                el.classList.remove('disrupted');
+                el.style.transform = '';
+                el.style.filter = '';
+                el.style.opacity = '';
+                el.style.animation = '';
+            }, 1000 + Math.random() * 14000); // Random time between 1-15 seconds
+        }
+    });
+}
+
+// Function to disrupt page elements
+function disruptPage() {
+    // Get random set of elements to disrupt
+    const sections = document.querySelectorAll('section');
+    const headers = document.querySelectorAll('h1, h2, h3, h4');
+    const paragraphs = document.querySelectorAll('p');
+    
+    // Randomly disrupt elements
+    const elementsToDisrupt = [
+        ...Array.from(sections).slice(0, Math.floor(Math.random() * sections.length)),
+        ...Array.from(headers).slice(0, Math.floor(Math.random() * headers.length)),
+        ...Array.from(paragraphs).slice(0, Math.floor(Math.random() * paragraphs.length))
+    ];
+    
+    // Add disruption class
+    elementsToDisrupt.forEach(el => {
+        el.classList.add('disrupted');
+        
+        // Remove class after random time
+        setTimeout(() => {
+            el.classList.remove('disrupted');
+        }, 500 + Math.random() * 1000);
+    });
+}
+
+// Function to move creepy image across screen
+function moveCreepy() {
+    if (isCreepyShowing && isMoving && !isMegaJumpscareActive) {
+        const maxX = window.innerWidth - 200;
+        const maxY = window.innerHeight - 200;
+        
+        // Generate random position
+        const newX = Math.random() * maxX;
+        const newY = Math.random() * maxY;
+        
+        // Small chance to trigger mega jumpscare (very rare chance: 0.5%)
+        if (Math.random() < 0.005) {
+            createMegaJumpscare();
+            return;
+        }
+        
+        // Add jumpscare effect occasionally
+        if (Math.random() < 0.3) {
+            creepyContainer.classList.add('jumpscare');
+            
+            // Change image size randomly
+            const newSize = Math.random() * 30 + 70; // 70-100% of original
+            creepyImage.style.maxHeight = `${newSize}vh`;
+            
+            // Remove jumpscare class after animation
+            setTimeout(() => {
+                creepyContainer.classList.remove('jumpscare');
+            }, 200);
+            
+            // Disrupt page when jumpscaring
+            disruptPage();
+        }
+        
+        // Move container with transition
+        creepyContainer.style.transition = 'left 0.5s, top 0.5s, transform 0.2s';
+        creepyContainer.style.left = `${newX}px`;
+        creepyContainer.style.top = `${newY}px`;
+        
+        // Randomly change message
+        if (Math.random() < 0.4) {
+            const randomMessage = creepyMessages[Math.floor(Math.random() * creepyMessages.length)];
+            creepyText.textContent = randomMessage;
+        }
+    }
+}
+
+// Function to randomly show creepy image
+function tryShowCreepy() {
+    if (!isCreepyShowing && !isMegaJumpscareActive && Math.random() < creepyChance) {
+        isCreepyShowing = true;
+        
+        // Small chance for direct mega jumpscare (rare: 1% of creepy appearances)
+        if (Math.random() < 0.01) {
+            // Position initially off-screen
+            creepyContainer.style.display = 'block';
+            creepyContainer.style.opacity = '1';
+            setTimeout(() => createMegaJumpscare(), 500);
+            return;
+        }
+        
+        // Select random message
+        const randomMessage = creepyMessages[Math.floor(Math.random() * creepyMessages.length)];
+        creepyText.textContent = randomMessage;
+        
+        // Decide if it appears on left or right initially
+        const onRight = Math.random() > 0.5;
+        
+        // Set random height
+        const randomHeight = Math.random() * (window.innerHeight - 400);
+        
+        // Position the container
+        creepyContainer.style.top = randomHeight + 'px';
+        
+        if (onRight) {
+            creepyContainer.style.right = '0';
+            creepyContainer.style.left = 'auto';
+            creepyText.style.textAlign = 'right';
+        } else {
+            creepyContainer.style.left = '0';
+            creepyContainer.style.right = 'auto';
+            creepyText.style.textAlign = 'left';
+        }
+        
+        // Show container with jumpscare effect
+        creepyContainer.style.display = 'block';
+        creepyContainer.style.opacity = '1';
+        creepyContainer.classList.add('jumpscare');
+        
+        // Remove jumpscare class after animation
+        setTimeout(() => {
+            creepyContainer.classList.remove('jumpscare');
+        }, 200);
+        
+        // Decide if this appearance will move across screen
+        isMoving = Math.random() < 0.7; // 70% chance to move
+        
+        if (isMoving) {
+            // Start moving after a short delay
+            setTimeout(() => {
+                // Convert position to absolute values for movement
+                const rect = creepyContainer.getBoundingClientRect();
+                creepyContainer.style.right = 'auto';
+                creepyContainer.style.left = rect.left + 'px';
+                
+                // Start movement
+                moveInterval = setInterval(moveCreepy, 1200);
+                
+                // Start page disruption
+                disruptInterval = setInterval(disruptPage, 2000);
+            }, 1000);
+        }
+        
+        // Hide after random time (8-15 seconds)
+        const hideTime = 8000 + Math.random() * 7000;
+        setTimeout(() => {
+            // Don't hide if mega jumpscare is active
+            if (isMegaJumpscareActive) return;
+            
+            // Fade out
+            creepyContainer.style.opacity = '0';
+            
+            // After fadeout completes, hide and reset
+            setTimeout(() => {
+                creepyContainer.style.display = 'none';
+                isCreepyShowing = false;
+                
+                // Clear intervals if they were set
+                if (moveInterval) {
+                    clearInterval(moveInterval);
+                    moveInterval = null;
+                }
+                
+                if (disruptInterval) {
+                    clearInterval(disruptInterval);
+                    disruptInterval = null;
+                }
+            }, 500);
+        }, hideTime);
+    }
+}
+
+// Check periodically if creepy image should appear
+setInterval(tryShowCreepy, 15000); // Normal interval (every 15 seconds)
 
 // Time and date update function for PDT
 function updateDateTime() {
@@ -673,6 +1329,14 @@ img.style.top = `${Math.min(currentY, document.body.scrollHeight - 100)}px`;
 });
 });
 });
+
+// Random number generator function
+function generateRandomNumber() {
+    const min = 1;
+    const max = 25;
+    const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+    document.getElementById('random-number').textContent = randomNumber;
+}
 </script>
 </body>
 </html>
