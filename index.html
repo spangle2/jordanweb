@@ -273,8 +273,8 @@ position: fixed;
 bottom: -150px;
 z-index: 999;
 transition: bottom 1.5s ease-out;
-pointer-events: none;
 will-change: bottom, left; /* Optimize for animations */
+cursor: pointer; /* Show pointer cursor to indicate clickable */
 }
 
 .cat-image {
@@ -283,6 +283,22 @@ height: auto;
 display: block; /* Ensure proper rendering */
 object-fit: contain; /* Ensure image is fully visible */
 max-height: 150px; /* Limit height to prevent overflow */
+}
+
+/* Cat points animation */
+.cat-points {
+    position: absolute;
+    color: gold;
+    font-weight: bold;
+    font-size: 24px;
+    text-shadow: 0 0 3px black;
+    pointer-events: none;
+    animation: float-up 1s forwards;
+}
+
+@keyframes float-up {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-50px); opacity: 0; }
 }
 
 /* Floating images styles */
@@ -504,7 +520,7 @@ transform: translateY(0) rotate(0deg);
     cursor: pointer; /* Shows hand cursor to indicate interactivity */
 }
 
-/* DVD logo animation */
+/* DVD logo animation container */
 .dvd-logo-container {
     position: fixed;
     top: 0;
@@ -593,6 +609,123 @@ transform: translateY(0) rotate(0deg);
     transform-origin: center !important;
     z-index: 9700 !important;
 }
+
+/* Zazu Coin styles */
+.zazu-coin-display {
+    background-color: gold;
+    color: #333;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: 2px solid #e6b800;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+}
+
+.zazu-coin-display img {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+.zazu-coin-display span {
+    font-size: 18px;
+}
+
+/* Cat collection panel */
+.cat-collection-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 160px; /* Position to the right of the Zazu coin display */
+    background-color: #7f99ff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+}
+
+.cat-collection-toggle:hover {
+    background-color: #6080ff;
+}
+
+.cat-collection-panel {
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    background-color: white;
+    border-radius: 10px;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 9998;
+    padding: 15px;
+    display: none;
+}
+
+.cat-collection-panel h3 {
+    margin-top: 0;
+    color: #444a5f;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.cat-collection-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s;
+}
+
+.cat-collection-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.cat-collection-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-right: 15px;
+}
+
+.cat-collection-item .cat-info {
+    flex-grow: 1;
+}
+
+.cat-collection-item .cat-name {
+    font-weight: bold;
+    color: #444a5f;
+}
+
+.cat-collection-item .cat-value {
+    color: gold;
+    font-weight: bold;
+    text-shadow: 0 0 1px rgba(0,0,0,0.5);
+}
+
+.cat-collection-item .cat-count {
+    background-color: #eee;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
 </style>
 </head>
 <body>
@@ -639,6 +772,21 @@ transform: translateY(0) rotate(0deg);
 
 <!-- Audio element for sound -->
 <audio id="randomSound" src="sound.mp3"></audio>
+<!-- Click sound effect -->
+<audio id="clickSound" src="click.mp3" preload="auto"></audio>
+
+<!-- Zazu Coin Display -->
+<div class="zazu-coin-display">
+    <img src="coin.png" alt="Zazu Coin" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'%3E%3Ccircle cx=\'12\' cy=\'12\' r=\'11\' fill=\'%23ffd700\' stroke=\'%23e6b800\' stroke-width=\'2\'/%3E%3Ctext x=\'12\' y=\'16\' font-family=\'Arial\' font-size=\'12\' font-weight=\'bold\' fill=\'%23333\' text-anchor=\'middle\'%3EZ%3C/text%3E%3C/svg%3E';">
+    <span id="zazu-coin-count">0</span>
+</div>
+
+<!-- Cat Collection Button and Panel -->
+<button class="cat-collection-toggle" id="catCollectionToggle">view zazu cats</button>
+<div class="cat-collection-panel" id="catCollectionPanel">
+    <h3>zazus</h3>
+    <div id="catCollectionItems"></div>
+</div>
 
 <header>
 <div class="container">
@@ -765,8 +913,14 @@ transform: translateY(0) rotate(0deg);
 
 <!-- Random Number Generator -->
 <div id="random-number-generator">
-    <span>Random Number (1-25): </span>
+    <span>Random Number: </span>
     <span id="random-number">-</span>
+    <div>
+        <label for="min-number">Min:</label>
+        <input type="number" id="min-number" value="1" min="0" style="width: 60px;">
+        <label for="max-number">Max:</label>
+        <input type="number" id="max-number" value="25" min="1" style="width: 60px;">
+    </div>
     <button onclick="generateRandomNumber()">Generate</button>
 </div>
 </div>
@@ -774,6 +928,195 @@ transform: translateY(0) rotate(0deg);
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Zazu Coin system
+    let zazuCoins = 0;
+    const catPointValues = {
+        'cat1.png': 10,   // Common cat - 1 point
+        'cat2.png': 50,   // Rare cat - 5 points
+        'cat3.png': 100,  // Legendary cat - 10 points
+        'cat4.jpg': 150,  // New cat - 15 points
+        'cat5.png': 200,  // New cat - 20 points
+        'cat6.jpg': 250,  // New cat - 25 points
+        'cat7.jpg': 300,  // New cat - 30 points
+        'cat8.jpg': 400,  // New cat - 40 points
+        'cat9.jpg': 500,  // New cat - 50 points
+        'cat10.jpg': 10000, // Supreme cat - 100 points
+        'cat11.png': 18900, // Supreme cat - 100 points
+        'cat12.jpg': 22500 // Supreme cat - 100 points
+    };
+    
+    // Cat collection tracking
+    let catCollection = {
+        'cat1.png': 0,
+        'cat2.png': 0,
+        'cat3.png': 0,
+        'cat4.jpg': 0,
+        'cat5.png': 0,
+        'cat6.jpg': 0,
+        'cat7.jpg': 0,
+        'cat8.jpg': 0,
+        'cat9.jpg': 0,
+        'cat10.jpg': 0,
+        'cat11.png': 0,
+        'cat12.jpg': 0
+    };
+    
+    // Cat display names
+    const catNames = {
+        'cat1.png': 'sad war',
+        'cat2.png': 'melon cattt',
+        'cat3.png': 'orginal zazu cat lol',
+        'cat4.jpg': 'music cat',
+        'cat5.png': 'italino Cat',
+        'cat6.jpg': 'mfdoom cat',
+        'cat7.jpg': 'drafted to war cat',
+        'cat8.jpg': 'darth zazu cat',
+        'cat9.jpg': 'business cat',
+        'cat10.jpg': 'big zazu cat very rare lol',
+        'cat11.png': 'ai zazu cat in war pretty rare',
+        'cat12.jpg': 'zazu cat with a watermelon hat idek'
+    };
+    
+    // Toggle cat collection panel
+    const catCollectionToggle = document.getElementById('catCollectionToggle');
+    const catCollectionPanel = document.getElementById('catCollectionPanel');
+    
+    catCollectionToggle.addEventListener('click', function() {
+        if (catCollectionPanel.style.display === 'block') {
+            catCollectionPanel.style.display = 'none';
+        } else {
+            catCollectionPanel.style.display = 'block';
+            updateCatCollection(); // Refresh the display when opening
+        }
+    });
+    
+    // Function to update cat collection display
+    function updateCatCollection() {
+        const collectionContainer = document.getElementById('catCollectionItems');
+        collectionContainer.innerHTML = '';
+        
+        // Get all cat types
+        const catTypes = Object.keys(catCollection);
+        
+        // Check if no cats have been collected yet
+        const totalCats = catTypes.reduce((total, type) => total + catCollection[type], 0);
+        if (totalCats === 0) {
+            collectionContainer.innerHTML = '<p style="text-align: center; color: #666;">No cats collected yet.<br>Click on cats as they appear!</p>';
+            return;
+        }
+        
+        // Create items for each cat type
+        catTypes.forEach(catType => {
+            // Skip if none of this type collected
+            if (catCollection[catType] === 0) return;
+            
+            const item = document.createElement('div');
+            item.className = 'cat-collection-item';
+            
+            // Create image
+            const img = document.createElement('img');
+            img.src = catType;
+            img.alt = catNames[catType];
+            
+            // Create info container
+            const info = document.createElement('div');
+            info.className = 'cat-info';
+            
+            // Add cat name
+            const name = document.createElement('div');
+            name.className = 'cat-name';
+            name.textContent = catNames[catType];
+            
+            // Add cat value
+            const value = document.createElement('div');
+            value.className = 'cat-value';
+            value.textContent = `${catPointValues[catType]} Zazu Coins`;
+            
+            // Add cat count
+            const count = document.createElement('div');
+            count.className = 'cat-count';
+            count.textContent = `Caught: ${catCollection[catType]}`;
+            
+            // Assemble the item
+            info.appendChild(name);
+            info.appendChild(value);
+            item.appendChild(img);
+            item.appendChild(info);
+            item.appendChild(count);
+            
+            // Add to container
+            collectionContainer.appendChild(item);
+        });
+    }
+
+    // Function to update coin display
+    function updateCoinDisplay() {
+        document.getElementById('zazu-coin-count').textContent = zazuCoins;
+    }
+
+    // Function to add coins and show animation
+    function addCoins(amount, x, y) {
+        zazuCoins += amount;
+        updateCoinDisplay();
+        
+        // Create floating point animation
+        const pointsElement = document.createElement('div');
+        pointsElement.className = 'cat-points';
+        pointsElement.textContent = '+' + amount;
+        pointsElement.style.left = x + 'px';
+        pointsElement.style.top = y + 'px';
+        document.body.appendChild(pointsElement);
+        
+        // Remove after animation completes
+        setTimeout(() => {
+            pointsElement.remove();
+        }, 1000);
+        
+        // Save to localStorage
+        localStorage.setItem('zazuCoins', zazuCoins.toString());
+    }
+    
+    // Load saved cat collection
+    function loadCatCollection() {
+        const savedCollection = localStorage.getItem('catCollection');
+        if (savedCollection) {
+            try {
+                catCollection = JSON.parse(savedCollection);
+            } catch (e) {
+                console.error('Error loading cat collection:', e);
+            }
+        }
+    }
+    
+    // Save cat collection
+    function saveCatCollection() {
+        localStorage.setItem('catCollection', JSON.stringify(catCollection));
+    }
+
+    // Load saved Zazu Coins and cat collection
+    const savedCoins = localStorage.getItem('zazuCoins');
+    if (savedCoins) {
+        zazuCoins = parseInt(savedCoins);
+        updateCoinDisplay();
+    }
+    
+    loadCatCollection();
+    updateCatCollection();
+
+    // Add click sound to entire document
+    const clickSound = document.getElementById('clickSound');
+    document.addEventListener('click', function(e) {
+        // Clone the audio element to allow overlapping sounds
+        const clickSoundClone = clickSound.cloneNode();
+        clickSoundClone.volume = 0.5; // Set volume to 50%
+        clickSoundClone.play();
+        
+        // Remove the cloned element when done playing
+        clickSoundClone.onended = function() {
+            clickSoundClone.remove();
+        };
+    });
+
     // Force refresh the Spotify embed when the page loads
     const spotifyFrame = document.getElementById('spotify-frame');
     if (spotifyFrame) {
@@ -786,6 +1129,175 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize persistent video
     initPersistentVideo();
+    
+    // Updated cat animation setup with Zazu coin integration
+    function setupCatAnimation() {
+        const catContainer = document.getElementById('cat-containers');
+        const catImages = [
+            'cat1.png', 'cat2.png', 'cat3.png', 
+            'cat4.jpg', 'cat5.png', 'cat6.jpg', 
+            'cat7.jpg', 'cat8.jpg', 'cat9.jpg', 'cat10.jpg'
+        ];
+        const numCats = 5; // Increase number of cats that can appear simultaneously
+        
+        // Clear any existing cats first
+        catContainer.innerHTML = '';
+        
+        // Create cat elements
+        for (let i = 0; i < numCats; i++) {
+            // Create container for cat
+            const cat = document.createElement('div');
+            cat.className = 'cat-container';
+            cat.style.left = `${Math.random() * (window.innerWidth - 150)}px`; // Random horizontal position
+            cat.style.bottom = '-150px'; // Start off-screen
+            cat.dataset.active = 'false'; // Track if this cat is currently active
+            cat.style.pointerEvents = 'auto'; // Make clickable
+            
+            // Create image element
+            const catImg = document.createElement('img');
+            catImg.className = 'cat-image';
+            
+            // Weighted random selection for cat images (rarer cats appear less frequently)
+            const randomValue = Math.random();
+            let selectedCat;
+            
+            if (randomValue < 0.50) { // 50% chance for common cat
+                selectedCat = 'cat1.png';
+            } else if (randomValue < 0.75) { // 25% chance for rare cat
+                selectedCat = 'cat2.png';
+            } else if (randomValue < 0.85) { // 10% chance for legendary cat
+                selectedCat = 'cat3.png';
+            } else if (randomValue < 0.90) { // 5% chance for mystic cat
+                selectedCat = 'cat4.jpg';
+            } else if (randomValue < 0.94) { // 4% chance
+                selectedCat = 'cat5.png';
+            } else if (randomValue < 0.97) { // 3% chance
+                selectedCat = Math.random() < 0.5 ? 'cat6.jpg' : 'cat7.jpg';
+            } else if (randomValue < 0.99) { // 2% chance
+                selectedCat = Math.random() < 0.5 ? 'cat8.jpg' : 'cat9.jpg';
+            } else { // 1% chance for supreme cat
+                selectedCat = 'cat10.jpg';
+            }
+            
+            catImg.src = selectedCat;
+            catImg.alt = catNames[selectedCat] || 'Cat';
+            
+            // Add click handler for Zazu Coins
+            cat.addEventListener('click', function(e) {
+                // Only clickable when active and visible
+                if (cat.dataset.active === 'true') {
+                    const catType = catImg.src.split('/').pop(); // Get filename
+                    const pointValue = catPointValues[catType] || 1; // Default to 1 if not found
+                    
+                    // Add coins at click position
+                    addCoins(pointValue, e.clientX, e.clientY);
+                    
+                    // Add to collection count
+                    catCollection[catType] = (catCollection[catType] || 0) + 1;
+                    saveCatCollection();
+                    
+                    // Send the cat away immediately after being clicked
+                    cat.style.transition = 'bottom 0.5s ease-in';
+                    cat.style.bottom = '-150px';
+                    
+                    // Mark as inactive after animation completes
+                    setTimeout(() => {
+                        cat.dataset.active = 'false';
+                    }, 600);
+                }
+            });
+            
+            // Special handling for cat2.png and cat10.jpg (larger cats)
+            if (catImg.src.endsWith('cat2.png') || catImg.src.endsWith('cat10.jpg')) {
+                catImg.style.maxHeight = '200px'; // Taller max-height
+                cat.style.bottom = '-200px'; // Start further off-screen
+            }
+            
+            cat.appendChild(catImg);
+            catContainer.appendChild(cat);
+        }
+        
+        // Function to animate cats randomly
+        function animateCats() {
+            const cats = document.querySelectorAll('.cat-container');
+            
+            // Check if any cats are stuck (active for too long)
+            cats.forEach(cat => {
+                // Check specifically for cat2.png being stuck
+                const catImg = cat.querySelector('.cat-image');
+                if (catImg && catImg.src.endsWith('cat2.png')) {
+                    // Make sure cat2.png is properly positioned
+                    if (parseFloat(cat.style.bottom) > -150 && parseFloat(cat.style.bottom) < 20) {
+                        // Force reset this stuck cat2
+                        cat.style.bottom = '-150px';
+                        cat.dataset.active = 'false';
+                        console.log('Fixed stuck cat2.png');
+                    }
+                }
+                
+                if (cat.dataset.active === 'true') {
+                    const activeTime = parseInt(cat.dataset.activeTime || '0');
+                    if (activeTime > 5000) { // If active for more than 5 seconds
+                        // Force reset this cat
+                        cat.style.bottom = '-150px';
+                        cat.dataset.active = 'false';
+                        console.log('Fixed a stuck cat');
+                    } else {
+                        cat.dataset.activeTime = activeTime + 1000;
+                    }
+                }
+            });
+            
+            // Find cats that aren't currently active
+            const inactiveCats = Array.from(cats).filter(cat => cat.dataset.active === 'false');
+            
+            // If all cats are active, don't try to animate a new one
+            if (inactiveCats.length === 0) return;
+            
+            // Select a random inactive cat to animate
+            const randomIndex = Math.floor(Math.random() * inactiveCats.length);
+            const selectedCat = inactiveCats[randomIndex];
+            
+            // Random horizontal position
+            selectedCat.style.left = `${Math.random() * (window.innerWidth - 150)}px`;
+            
+            // Mark as active and reset active time counter
+            selectedCat.dataset.active = 'true';
+            selectedCat.dataset.activeTime = '0';
+            
+            // Slide up animation - ensure it's high enough
+            selectedCat.style.transition = 'bottom 1.5s ease-out';
+            
+            // If this is cat2.png, give it extra height to be fully visible
+            const catImg = selectedCat.querySelector('.cat-image');
+            if (catImg && catImg.src.endsWith('cat2.png')) {
+                selectedCat.style.bottom = '30px'; // Higher position for cat2.png
+            } else {
+                selectedCat.style.bottom = '20px';
+            }
+            
+            // After 3 seconds, slide down
+            setTimeout(() => {
+                selectedCat.style.transition = 'bottom 1s ease-in';
+                selectedCat.style.bottom = '-150px';
+                
+                // Mark as inactive after animation completes
+                setTimeout(() => {
+                    selectedCat.dataset.active = 'false';
+                    
+                    // Change the cat image
+                    const catImg = selectedCat.querySelector('.cat-image');
+                    const currentSrc = catImg.src;
+                    const currentCatIndex = catImages.findIndex(img => currentSrc.endsWith(img));
+                    const nextCatIndex = (currentCatIndex + 1) % catImages.length;
+                    catImg.src = catImages[nextCatIndex];
+                }, 1100); // Wait slightly longer than the transition
+            }, 3000);
+        }
+        
+        // Start cat animations at random intervals
+        setInterval(animateCats, 5000);
+    }
     
     // Initialize cat animations
     setupCatAnimation();
@@ -1402,122 +1914,6 @@ updateNKDateTime();
 setInterval(updateDateTime, 1000);
 setInterval(updateNKDateTime, 1000);
 
-// Cat image animation functionality
-function setupCatAnimation() {
-const catContainer = document.getElementById('cat-containers');
-const catImages = ['cat1.png', 'cat2.png', 'cat3.png'];
-const numCats = 3;
-    
-    // Clear any existing cats first
-    catContainer.innerHTML = '';
-
-// Create cat elements
-for (let i = 0; i < numCats; i++) {
-// Create container for cat
-const cat = document.createElement('div');
-cat.className = 'cat-container';
-cat.style.left = `${Math.random() * (window.innerWidth - 150)}px`; // Random horizontal position
-        cat.style.bottom = '-150px'; // Start off-screen
-        cat.dataset.active = 'false'; // Track if this cat is currently active
-
-// Create image element
-const catImg = document.createElement('img');
-catImg.className = 'cat-image';
-catImg.src = catImages[i % catImages.length]; // Cycle through cat images
-catImg.alt = 'Cat';
-        
-        // Special handling for cat2.png
-        if (catImg.src.endsWith('cat2.png')) {
-            catImg.style.maxHeight = '200px'; // Taller max-height for cat2.png
-            cat.style.bottom = '-200px'; // Start further off-screen
-        }
-
-cat.appendChild(catImg);
-catContainer.appendChild(cat);
-}
-
-// Function to animate cats randomly
-function animateCats() {
-const cats = document.querySelectorAll('.cat-container');
-
-        // Check if any cats are stuck (active for too long)
-        cats.forEach(cat => {
-            // Check specifically for cat2.png being stuck
-            const catImg = cat.querySelector('.cat-image');
-            if (catImg && catImg.src.endsWith('cat2.png')) {
-                // Make sure cat2.png is properly positioned
-                if (parseFloat(cat.style.bottom) > -150 && parseFloat(cat.style.bottom) < 20) {
-                    // Force reset this stuck cat2
-                    cat.style.bottom = '-150px';
-                    cat.dataset.active = 'false';
-                    console.log('Fixed stuck cat2.png');
-                }
-            }
-            
-            if (cat.dataset.active === 'true') {
-                const activeTime = parseInt(cat.dataset.activeTime || '0');
-                if (activeTime > 5000) { // If active for more than 5 seconds
-                    // Force reset this cat
-                    cat.style.bottom = '-150px';
-                    cat.dataset.active = 'false';
-                    console.log('Fixed a stuck cat');
-                } else {
-                    cat.dataset.activeTime = activeTime + 1000;
-                }
-            }
-        });
-        
-        // Find cats that aren't currently active
-        const inactiveCats = Array.from(cats).filter(cat => cat.dataset.active === 'false');
-        
-        // If all cats are active, don't try to animate a new one
-        if (inactiveCats.length === 0) return;
-        
-        // Select a random inactive cat to animate
-        const randomIndex = Math.floor(Math.random() * inactiveCats.length);
-        const selectedCat = inactiveCats[randomIndex];
-
-// Random horizontal position
-selectedCat.style.left = `${Math.random() * (window.innerWidth - 150)}px`;
-
-        // Mark as active and reset active time counter
-        selectedCat.dataset.active = 'true';
-        selectedCat.dataset.activeTime = '0';
-        
-        // Slide up animation - ensure it's high enough
-        selectedCat.style.transition = 'bottom 1.5s ease-out';
-        
-        // If this is cat2.png, give it extra height to be fully visible
-        const catImg = selectedCat.querySelector('.cat-image');
-        if (catImg && catImg.src.endsWith('cat2.png')) {
-            selectedCat.style.bottom = '30px'; // Higher position for cat2.png
-        } else {
-selectedCat.style.bottom = '20px';
-        }
-
-// After 3 seconds, slide down
-setTimeout(() => {
-            selectedCat.style.transition = 'bottom 1s ease-in';
-selectedCat.style.bottom = '-150px';
-            
-            // Mark as inactive after animation completes
-            setTimeout(() => {
-                selectedCat.dataset.active = 'false';
-
-// Change the cat image
-const catImg = selectedCat.querySelector('.cat-image');
-const currentSrc = catImg.src;
-const currentCatIndex = catImages.findIndex(img => currentSrc.endsWith(img));
-const nextCatIndex = (currentCatIndex + 1) % catImages.length;
-catImg.src = catImages[nextCatIndex];
-            }, 1100); // Wait slightly longer than the transition
-}, 3000);
-}
-
-// Start cat animations at random intervals
-setInterval(animateCats, 5000);
-}
-
 // Persistent video functionality
 const persistentVideoOverlay = document.getElementById('persistentVideoOverlay');
 const persistentVideo = document.getElementById('persistentVideo');
@@ -1751,8 +2147,15 @@ function hideDvdLogo() {
 
 // Random number generator function
 function generateRandomNumber() {
-    const min = 1;
-    const max = 25;
+    const min = parseInt(document.getElementById('min-number').value) || 1;
+    const max = parseInt(document.getElementById('max-number').value) || 25;
+    
+    // Ensure min is less than max
+    if (min >= max) {
+        alert('Min value must be less than max value');
+        return;
+    }
+    
     const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
     document.getElementById('random-number').textContent = randomNumber;
     
@@ -1976,3 +2379,4 @@ function restoreSuckedElements() {
 </script>
 </body>
 </html>
+
