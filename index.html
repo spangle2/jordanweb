@@ -274,11 +274,15 @@ bottom: -150px;
 z-index: 999;
 transition: bottom 1.5s ease-out;
 pointer-events: none;
+will-change: bottom, left; /* Optimize for animations */
 }
 
 .cat-image {
 width: 150px;
 height: auto;
+display: block; /* Ensure proper rendering */
+object-fit: contain; /* Ensure image is fully visible */
+max-height: 150px; /* Limit height to prevent overflow */
 }
 
 /* Floating images styles */
@@ -483,6 +487,81 @@ transform: translateY(0) rotate(0deg);
     50% { transform: scale(1.1); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
 }
+
+/* Persistent video overlay */
+.persistent-video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9500;
+    background-color: black;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; /* Shows hand cursor to indicate interactivity */
+}
+
+/* DVD logo animation */
+.dvd-logo-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9000;
+    background-color: transparent;
+    display: none;
+    overflow: hidden;
+    pointer-events: none; /* Allow clicks to pass through */
+}
+
+.dvd-logo {
+    position: absolute;
+    width: 150px; /* Slightly smaller for better visibility */
+    height: auto;
+    user-select: none; /* Prevent selection */
+}
+
+.persistent-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hold-indicator {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    width: 80%;
+    max-width: 500px;
+    height: 30px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.hold-progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff3333, #00cc00);
+    transition: width 0.3s linear;
+}
+
+.hold-text {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 5px black;
+    transform: translateY(-50%);
+}
 </style>
 </head>
 <body>
@@ -500,6 +579,20 @@ transform: translateY(0) rotate(0deg);
 <div class="creepy-container" id="creepyContainer">
     <img id="creepyImage" class="creepy-image" src="diaimg.png" alt="Creepy">
     <div id="creepyText" class="creepy-text"></div>
+</div>
+
+<!-- Persistent video overlay -->
+<div class="persistent-video-overlay" id="persistentVideoOverlay">
+    <video id="persistentVideo" class="persistent-video" src="vid3.mp4" loop muted></video>
+    <div class="hold-indicator">
+        <div class="hold-progress" id="holdProgress"></div>
+        <div class="hold-text">Hold mouse button down for 10 seconds to dismiss</div>
+    </div>
+</div>
+
+<!-- DVD logo animation container -->
+<div class="dvd-logo-container" id="dvdLogoContainer">
+    <img src="dvd.png" alt="DVD Logo" class="dvd-logo" id="dvdLogo">
 </div>
 
 <!-- Floating images container - will be populated by JavaScript -->
@@ -654,6 +747,99 @@ document.addEventListener('DOMContentLoaded', function() {
             spotifyFrame.src = originalSrc;
         }, 100);
     }
+    
+    // Initialize persistent video
+    initPersistentVideo();
+    
+    // Initialize cat animations
+    setupCatAnimation();
+    
+    // Reset cat animations when window is resized
+    window.addEventListener('resize', function() {
+        // Delay the reset to avoid multiple calls during resize
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(function() {
+            setupCatAnimation();
+        }, 250);
+    });
+
+// Floating images functionality
+const container = document.getElementById('floating-images-container');
+const imageUrls = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png'];
+const numberOfImages = 15; // Total number of floating images
+
+// Create the specified number of floating images
+for (let i = 0; i < numberOfImages; i++) {
+// Randomly select an image
+const randomImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+
+// Create image element
+const imgElement = document.createElement('img');
+imgElement.src = randomImageUrl;
+imgElement.alt = 'Floating image';
+
+// Create container div for the image
+const floatingElement = document.createElement('div');
+floatingElement.className = 'floating-image';
+floatingElement.appendChild(imgElement);
+
+// Set random size (between 30px and 100px)
+const size = Math.random() * 70 + 30;
+floatingElement.style.width = `${size}px`;
+floatingElement.style.height = `${size}px`;
+
+// Set random initial position
+const posX = Math.random() * window.innerWidth;
+const posY = Math.random() * document.body.scrollHeight;
+floatingElement.style.left = `${posX}px`;
+floatingElement.style.top = `${posY}px`;
+
+// Set random animation duration and delay
+const animDuration = Math.random() * 10 + 5; // 5-15 seconds
+const animDelay = Math.random() * 5; // 0-5 seconds
+floatingElement.style.animation = `float ${animDuration}s ease-in-out ${animDelay}s infinite`;
+
+// Add rotation for more dynamic movement
+floatingElement.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+// Add to container
+container.appendChild(floatingElement);
+}
+
+// Function to move images around randomly
+function moveImages() {
+const floatingImages = document.querySelectorAll('.floating-image');
+
+floatingImages.forEach(img => {
+// Get current position
+const currentX = parseFloat(img.style.left);
+const currentY = parseFloat(img.style.top);
+
+// Generate random movement (between -50 and 50 pixels)
+const moveX = (Math.random() - 0.5) * 100;
+const moveY = (Math.random() - 0.5) * 100;
+
+// Calculate new position with boundaries
+let newX = currentX + moveX;
+let newY = currentY + moveY;
+
+// Keep images within viewport
+newX = Math.max(0, Math.min(newX, window.innerWidth - 100));
+newY = Math.max(0, Math.min(newY, document.body.scrollHeight - 100));
+
+// Apply new position with smooth transition
+img.style.transition = 'left 8s, top 8s';
+img.style.left = `${newX}px`;
+img.style.top = `${newY}px`;
+
+// Random rotation
+const rotation = Math.random() * 360;
+img.style.transform = `rotate(${rotation}deg)`;
+});
+}
+
+// Move images periodically
+setInterval(moveImages, 8000);
 });
 
 // Audio play functionality
@@ -1180,90 +1366,14 @@ updateNKDateTime();
 setInterval(updateDateTime, 1000);
 setInterval(updateNKDateTime, 1000);
 
-// Floating images functionality
-document.addEventListener('DOMContentLoaded', function() {
-const container = document.getElementById('floating-images-container');
-const imageUrls = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png'];
-const numberOfImages = 15; // Total number of floating images
-
-// Create the specified number of floating images
-for (let i = 0; i < numberOfImages; i++) {
-// Randomly select an image
-const randomImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)];
-
-// Create image element
-const imgElement = document.createElement('img');
-imgElement.src = randomImageUrl;
-imgElement.alt = 'Floating image';
-
-// Create container div for the image
-const floatingElement = document.createElement('div');
-floatingElement.className = 'floating-image';
-floatingElement.appendChild(imgElement);
-
-// Set random size (between 30px and 100px)
-const size = Math.random() * 70 + 30;
-floatingElement.style.width = `${size}px`;
-floatingElement.style.height = `${size}px`;
-
-// Set random initial position
-const posX = Math.random() * window.innerWidth;
-const posY = Math.random() * document.body.scrollHeight;
-floatingElement.style.left = `${posX}px`;
-floatingElement.style.top = `${posY}px`;
-
-// Set random animation duration and delay
-const animDuration = Math.random() * 10 + 5; // 5-15 seconds
-const animDelay = Math.random() * 5; // 0-5 seconds
-floatingElement.style.animation = `float ${animDuration}s ease-in-out ${animDelay}s infinite`;
-
-// Add rotation for more dynamic movement
-floatingElement.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-// Add to container
-container.appendChild(floatingElement);
-}
-
-// Function to move images around randomly
-function moveImages() {
-const floatingImages = document.querySelectorAll('.floating-image');
-
-floatingImages.forEach(img => {
-// Get current position
-const currentX = parseFloat(img.style.left);
-const currentY = parseFloat(img.style.top);
-
-// Generate random movement (between -50 and 50 pixels)
-const moveX = (Math.random() - 0.5) * 100;
-const moveY = (Math.random() - 0.5) * 100;
-
-// Calculate new position with boundaries
-let newX = currentX + moveX;
-let newY = currentY + moveY;
-
-// Keep images within viewport
-newX = Math.max(0, Math.min(newX, window.innerWidth - 100));
-newY = Math.max(0, Math.min(newY, document.body.scrollHeight - 100));
-
-// Apply new position with smooth transition
-img.style.transition = 'left 8s, top 8s';
-img.style.left = `${newX}px`;
-img.style.top = `${newY}px`;
-
-// Random rotation
-const rotation = Math.random() * 360;
-img.style.transform = `rotate(${rotation}deg)`;
-});
-}
-
-// Move images periodically
-setInterval(moveImages, 8000);
-
 // Cat image animation functionality
 function setupCatAnimation() {
 const catContainer = document.getElementById('cat-containers');
 const catImages = ['cat1.png', 'cat2.png', 'cat3.png'];
 const numCats = 3;
+    
+    // Clear any existing cats first
+    catContainer.innerHTML = '';
 
 // Create cat elements
 for (let i = 0; i < numCats; i++) {
@@ -1271,12 +1381,20 @@ for (let i = 0; i < numCats; i++) {
 const cat = document.createElement('div');
 cat.className = 'cat-container';
 cat.style.left = `${Math.random() * (window.innerWidth - 150)}px`; // Random horizontal position
+        cat.style.bottom = '-150px'; // Start off-screen
+        cat.dataset.active = 'false'; // Track if this cat is currently active
 
 // Create image element
 const catImg = document.createElement('img');
 catImg.className = 'cat-image';
 catImg.src = catImages[i % catImages.length]; // Cycle through cat images
 catImg.alt = 'Cat';
+        
+        // Special handling for cat2.png
+        if (catImg.src.endsWith('cat2.png')) {
+            catImg.style.maxHeight = '200px'; // Taller max-height for cat2.png
+            cat.style.bottom = '-200px'; // Start further off-screen
+        }
 
 cat.appendChild(catImg);
 catContainer.appendChild(cat);
@@ -1286,19 +1404,69 @@ catContainer.appendChild(cat);
 function animateCats() {
 const cats = document.querySelectorAll('.cat-container');
 
-// Select a random cat to animate
-const randomIndex = Math.floor(Math.random() * cats.length);
-const selectedCat = cats[randomIndex];
+        // Check if any cats are stuck (active for too long)
+        cats.forEach(cat => {
+            // Check specifically for cat2.png being stuck
+            const catImg = cat.querySelector('.cat-image');
+            if (catImg && catImg.src.endsWith('cat2.png')) {
+                // Make sure cat2.png is properly positioned
+                if (parseFloat(cat.style.bottom) > -150 && parseFloat(cat.style.bottom) < 20) {
+                    // Force reset this stuck cat2
+                    cat.style.bottom = '-150px';
+                    cat.dataset.active = 'false';
+                    console.log('Fixed stuck cat2.png');
+                }
+            }
+            
+            if (cat.dataset.active === 'true') {
+                const activeTime = parseInt(cat.dataset.activeTime || '0');
+                if (activeTime > 5000) { // If active for more than 5 seconds
+                    // Force reset this cat
+                    cat.style.bottom = '-150px';
+                    cat.dataset.active = 'false';
+                    console.log('Fixed a stuck cat');
+                } else {
+                    cat.dataset.activeTime = activeTime + 1000;
+                }
+            }
+        });
+        
+        // Find cats that aren't currently active
+        const inactiveCats = Array.from(cats).filter(cat => cat.dataset.active === 'false');
+        
+        // If all cats are active, don't try to animate a new one
+        if (inactiveCats.length === 0) return;
+        
+        // Select a random inactive cat to animate
+        const randomIndex = Math.floor(Math.random() * inactiveCats.length);
+        const selectedCat = inactiveCats[randomIndex];
 
 // Random horizontal position
 selectedCat.style.left = `${Math.random() * (window.innerWidth - 150)}px`;
 
-// Slide up animation
+        // Mark as active and reset active time counter
+        selectedCat.dataset.active = 'true';
+        selectedCat.dataset.activeTime = '0';
+        
+        // Slide up animation - ensure it's high enough
+        selectedCat.style.transition = 'bottom 1.5s ease-out';
+        
+        // If this is cat2.png, give it extra height to be fully visible
+        const catImg = selectedCat.querySelector('.cat-image');
+        if (catImg && catImg.src.endsWith('cat2.png')) {
+            selectedCat.style.bottom = '30px'; // Higher position for cat2.png
+        } else {
 selectedCat.style.bottom = '20px';
+        }
 
 // After 3 seconds, slide down
 setTimeout(() => {
+            selectedCat.style.transition = 'bottom 1s ease-in';
 selectedCat.style.bottom = '-150px';
+            
+            // Mark as inactive after animation completes
+            setTimeout(() => {
+                selectedCat.dataset.active = 'false';
 
 // Change the cat image
 const catImg = selectedCat.querySelector('.cat-image');
@@ -1306,6 +1474,7 @@ const currentSrc = catImg.src;
 const currentCatIndex = catImages.findIndex(img => currentSrc.endsWith(img));
 const nextCatIndex = (currentCatIndex + 1) % catImages.length;
 catImg.src = catImages[nextCatIndex];
+            }, 1100); // Wait slightly longer than the transition
 }, 3000);
 }
 
@@ -1313,22 +1482,236 @@ catImg.src = catImages[nextCatIndex];
 setInterval(animateCats, 5000);
 }
 
-// Setup cat animations when DOM is loaded
-setupCatAnimation();
+// Persistent video functionality
+const persistentVideoOverlay = document.getElementById('persistentVideoOverlay');
+const persistentVideo = document.getElementById('persistentVideo');
+const holdProgress = document.getElementById('holdProgress');
+let persistentVideoTimer;
+let isPersistentVideoShowing = false;
+let holdStartTime = 0;
+let holdDuration = 10000; // 30 seconds in milliseconds
+let holdInterval;
+let mouseIsDown = false;
 
-// Handle window resize
-window.addEventListener('resize', function() {
-const floatingImages = document.querySelectorAll('.floating-image');
-floatingImages.forEach(img => {
-// Make sure images stay within the new viewport size
-const currentX = parseFloat(img.style.left);
-const currentY = parseFloat(img.style.top);
+// Initialize persistent video
+function initPersistentVideo() {
+    // Set up event listeners
+    persistentVideoOverlay.addEventListener('mousedown', startHolding);
+    persistentVideoOverlay.addEventListener('mouseup', stopHolding);
+    persistentVideoOverlay.addEventListener('mouseleave', stopHolding);
+    
+    // Schedule first appearance
+    scheduleVideoAppearance();
+}
 
-img.style.left = `${Math.min(currentX, window.innerWidth - 100)}px`;
-img.style.top = `${Math.min(currentY, document.body.scrollHeight - 100)}px`;
-});
-});
-});
+// Schedule video to appear randomly between 30 seconds and 2 minutes
+function scheduleVideoAppearance() {
+    if (persistentVideoTimer) clearTimeout(persistentVideoTimer);
+    
+    // Random time between 30 seconds and 2 minutes (30000-120000 ms)
+    const minTime = 300000; // 30 seconds
+    const maxTime = 3000000; // 2 minutes
+    const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+    
+    persistentVideoTimer = setTimeout(() => {
+        showPersistentVideo();
+    }, randomTime);
+    
+    console.log(`Persistent video scheduled to appear in ${Math.round(randomTime/1000)} seconds`);
+}
+
+// Show the persistent video
+function showPersistentVideo() {
+    if (isPersistentVideoShowing) return;
+    isPersistentVideoShowing = true;
+    
+    // Reset hold progress
+    holdProgress.style.width = '0%';
+    
+    // Show the overlay
+    persistentVideoOverlay.style.display = 'flex';
+    
+    // Start the video with audio
+    persistentVideo.muted = false;
+    persistentVideo.play();
+}
+
+// Start the holding process
+function startHolding(e) {
+    if (!isPersistentVideoShowing) return;
+    
+    // Prevent default behavior
+    e.preventDefault();
+    
+    mouseIsDown = true;
+    holdStartTime = Date.now();
+    
+    // Clear any existing interval
+    if (holdInterval) clearInterval(holdInterval);
+    
+    // Update progress every 50ms
+    holdInterval = setInterval(() => {
+        if (!mouseIsDown) return;
+        
+        const elapsedTime = Date.now() - holdStartTime;
+        const progress = Math.min(100, (elapsedTime / holdDuration) * 100);
+        
+        // Update progress bar
+        holdProgress.style.width = `${progress}%`;
+        
+        // Adjust opacity based on progress
+        persistentVideoOverlay.style.opacity = 1 - (progress / 100);
+        
+        // If completed, dismiss the video
+        if (progress >= 100) {
+            dismissPersistentVideo();
+        }
+    }, 50);
+}
+
+// Stop the holding process
+function stopHolding() {
+    mouseIsDown = false;
+    
+    // Keep the current progress, but stop updating
+    if (holdInterval) {
+        clearInterval(holdInterval);
+        holdInterval = null;
+    }
+}
+
+// Dismiss the persistent video
+function dismissPersistentVideo() {
+    // Clear any intervals
+    if (holdInterval) {
+        clearInterval(holdInterval);
+        holdInterval = null;
+    }
+    
+    // Reset flags
+    mouseIsDown = false;
+    isPersistentVideoShowing = false;
+    
+    // Hide the overlay
+    persistentVideoOverlay.style.display = 'none';
+    persistentVideoOverlay.style.opacity = '1';
+    
+    // Stop the video
+    persistentVideo.pause();
+    persistentVideo.currentTime = 0;
+    
+    // Reset progress
+    holdProgress.style.width = '0%';
+    
+    // Schedule next appearance
+    scheduleVideoAppearance();
+}
+
+// DVD logo animation functionality
+const dvdLogoContainer = document.getElementById('dvdLogoContainer');
+const dvdLogo = document.getElementById('dvdLogo');
+let dvdAnimationTimer;
+let dvdX = 10;
+let dvdY = 10;
+let dvdXSpeed = 3;
+let dvdYSpeed = 3;
+let dvdAnimationInterval;
+
+// Initialize DVD logo
+function initDvdLogo() {
+    // Set initial position
+    dvdLogo.style.position = 'absolute';
+    dvdLogo.style.left = '50px';
+    dvdLogo.style.top = '50px';
+}
+
+// Call initialization
+initDvdLogo();
+
+// Show DVD logo animation
+function showDvdLogo() {
+    // Already showing
+    if (dvdLogoContainer.style.display === 'block') return;
+    
+    // Set initial position
+    dvdX = 50;
+    dvdY = 50;
+    dvdLogo.style.left = `${dvdX}px`;
+    dvdLogo.style.top = `${dvdY}px`;
+    
+    // Set initial speed (random direction)
+    dvdXSpeed = (Math.random() > 0.5 ? 1 : -1) * (3 + Math.random() * 2);
+    dvdYSpeed = (Math.random() > 0.5 ? 1 : -1) * (3 + Math.random() * 2);
+    
+    // Show container
+    dvdLogoContainer.style.display = 'block';
+    
+    // Start animation
+    if (dvdAnimationInterval) clearInterval(dvdAnimationInterval);
+    dvdAnimationInterval = setInterval(animateDvdLogo, 16); // ~60fps
+    
+    // Set timeout to hide after 10 seconds
+    if (dvdAnimationTimer) clearTimeout(dvdAnimationTimer);
+    dvdAnimationTimer = setTimeout(() => {
+        hideDvdLogo();
+    }, 10000);
+}
+
+// Animate DVD logo
+function animateDvdLogo() {
+    // Get container dimensions
+    const maxX = window.innerWidth - dvdLogo.offsetWidth;
+    const maxY = window.innerHeight - dvdLogo.offsetHeight;
+    
+    // Move logo
+    dvdX += dvdXSpeed;
+    dvdY += dvdYSpeed;
+    
+    // Ensure we're within bounds (in case of window resize)
+    dvdX = Math.max(0, Math.min(dvdX, maxX));
+    dvdY = Math.max(0, Math.min(dvdY, maxY));
+    
+    // Bounce off edges
+    if (dvdX <= 0 || dvdX >= maxX) {
+        dvdXSpeed = -dvdXSpeed;
+        // Add slight randomness to prevent getting stuck in patterns
+        dvdXSpeed *= 0.9 + Math.random() * 0.2;
+    }
+    
+    if (dvdY <= 0 || dvdY >= maxY) {
+        dvdYSpeed = -dvdYSpeed;
+        // Add slight randomness to prevent getting stuck in patterns
+        dvdYSpeed *= 0.9 + Math.random() * 0.2;
+    }
+    
+    // Ensure minimum speed
+    if (Math.abs(dvdXSpeed) < 2) dvdXSpeed = dvdXSpeed > 0 ? 2 : -2;
+    if (Math.abs(dvdYSpeed) < 2) dvdYSpeed = dvdYSpeed > 0 ? 2 : -2;
+    
+    // Apply new position
+    dvdLogo.style.left = `${dvdX}px`;
+    dvdLogo.style.top = `${dvdY}px`;
+    
+    // Log position for debugging (remove in production)
+    console.log(`DVD position: ${Math.round(dvdX)}, ${Math.round(dvdY)}`);
+}
+
+// Hide DVD logo animation
+function hideDvdLogo() {
+    dvdLogoContainer.style.display = 'none';
+    
+    // Clear interval
+    if (dvdAnimationInterval) {
+        clearInterval(dvdAnimationInterval);
+        dvdAnimationInterval = null;
+    }
+    
+    // Clear timeout
+    if (dvdAnimationTimer) {
+        clearTimeout(dvdAnimationTimer);
+        dvdAnimationTimer = null;
+    }
+}
 
 // Random number generator function
 function generateRandomNumber() {
@@ -1336,6 +1719,16 @@ function generateRandomNumber() {
     const max = 25;
     const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
     document.getElementById('random-number').textContent = randomNumber;
+    
+    // Secret: If you get 25, trigger the persistent video (for testing)
+    if (randomNumber === 25) {
+        showPersistentVideo();
+    }
+    
+    // If you get 2, show the bouncing DVD logo
+    if (randomNumber === 2) {
+        showDvdLogo();
+    }
 }
 </script>
 </body>
