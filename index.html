@@ -1153,11 +1153,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupCatAnimation() {
         const catContainer = document.getElementById('cat-containers');
         const catImages = [
-            'cat1.png', 'cat2.png', 'cat3.png', 
-            'cat4.jpg', 'cat5.png', 'cat6.jpg', 
-            'cat7.jpg', 'cat8.jpg', 'cat9.jpg', 'cat10.jpg'
+            'cat1.png', 'cat2.png', 'cat3.png',
+            'cat4.jpg', 'cat5.png', 'cat6.jpg',
+            'cat7.jpg', 'cat8.jpg', 'cat9.jpg', 'cat10.jpg',
+            'cat11.png', 'cat12.jpg', 'cat13.jpg', 'cat14.jpg',
+            'cat15.png', 'cat16.png', 'cat17.jpg', 'cat18.jpg'
         ];
-        const numCats = 5; // Increase number of cats that can appear simultaneously
+        const numCats = 8; // Increase number of cats that can appear simultaneously
         
         // Clear any existing cats first
         catContainer.innerHTML = '';
@@ -1180,23 +1182,30 @@ document.addEventListener('DOMContentLoaded', function() {
             const randomValue = Math.random();
             let selectedCat;
             
-            if (randomValue < 0.50) { // 50% chance for common cat
-                selectedCat = 'cat1.png';
-            } else if (randomValue < 0.75) { // 25% chance for rare cat
-                selectedCat = 'cat2.png';
-            } else if (randomValue < 0.85) { // 10% chance for legendary cat
-                selectedCat = 'cat3.png';
-            } else if (randomValue < 0.90) { // 5% chance for mystic cat
-                selectedCat = 'cat4.jpg';
-            } else if (randomValue < 0.94) { // 4% chance
-                selectedCat = 'cat5.png';
-            } else if (randomValue < 0.97) { // 3% chance
-                selectedCat = Math.random() < 0.5 ? 'cat6.jpg' : 'cat7.jpg';
-            } else if (randomValue < 0.99) { // 2% chance
-                selectedCat = Math.random() < 0.5 ? 'cat8.jpg' : 'cat9.jpg';
-            } else { // 1% chance for supreme cat
-                selectedCat = 'cat10.jpg';
-            }
+            if (randomValue < 0.60) { // 60% chance for most common cats
+            // Tier 1 (Most Common: 60%)
+            const tier1Cats = ['cat1.png', 'cat2.png', 'cat3.png'];
+            selectedCat = tier1Cats[Math.floor(Math.random() * tier1Cats.length)];
+        } else if (randomValue < 0.80) { // 20% chance for uncommon cats
+            // Tier 2 (Uncommon: 20%)
+            const tier2Cats = ['cat4.jpg', 'cat5.png', 'cat6.jpg', 'cat7.jpg', 'cat8.jpg'];
+            selectedCat = tier2Cats[Math.floor(Math.random() * tier2Cats.length)];
+        } else if (randomValue < 0.92) { // 12% chance for rare cats
+            // Tier 3 (Rare: 12%)
+            const tier3Cats = ['cat9.jpg', 'cat10.jpg', 'cat11.png', 'cat12.jpg'];
+            selectedCat = tier3Cats[Math.floor(Math.random() * tier3Cats.length)];
+        } else if (randomValue < 0.97) { // 5% chance for very rare cats
+            // Tier 4 (Very Rare: 5%)
+            const tier4Cats = ['cat13.jpg', 'cat14.jpg', 'cat15.png'];
+            selectedCat = tier4Cats[Math.floor(Math.random() * tier4Cats.length)];
+        } else if (randomValue < 0.99) { // 2% chance for epic cats
+            // Tier 5 (Epic: 2%)
+            const tier5Cats = ['cat16.png', 'cat17.jpg'];
+            selectedCat = tier5Cats[Math.floor(Math.random() * tier5Cats.length)];
+        } else { // 1% chance for legendary cat
+            // Tier 6 (Legendary: 1%)
+            selectedCat = 'cat18.jpg';
+        }
             
             catImg.src = selectedCat;
             catImg.alt = catNames[selectedCat] || 'Cat';
