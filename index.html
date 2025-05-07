@@ -562,6 +562,37 @@ transform: translateY(0) rotate(0deg);
     text-shadow: 0 0 5px black;
     transform: translateY(-50%);
 }
+
+/* Black hole animation */
+.blackhole-container {
+    position: fixed;
+    z-index: 9800;
+    display: none;
+    transition: left 3s ease-out, top 3s ease-out;
+    pointer-events: none;
+}
+
+.blackhole-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: brightness(1.2) contrast(1.2);
+    box-shadow: 0 0 50px 10px rgba(128, 0, 255, 0.7);
+    animation: rotate 8s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Class applied to elements being sucked in */
+.sucked-in {
+    transition: all 1.5s cubic-bezier(0.17, 0.89, 0.32, 1.49) !important;
+    transform-origin: center !important;
+    z-index: 9700 !important;
+}
 </style>
 </head>
 <body>
@@ -593,6 +624,11 @@ transform: translateY(0) rotate(0deg);
 <!-- DVD logo animation container -->
 <div class="dvd-logo-container" id="dvdLogoContainer">
     <img src="dvd.png" alt="DVD Logo" class="dvd-logo" id="dvdLogo">
+</div>
+
+<!-- Black hole animation container -->
+<div class="blackhole-container" id="blackholeContainer">
+    <img src="blackhole.gif" alt="Black Hole" class="blackhole-image" id="blackholeImage">
 </div>
 
 <!-- Floating images container - will be populated by JavaScript -->
@@ -1729,7 +1765,215 @@ function generateRandomNumber() {
     if (randomNumber === 2) {
         showDvdLogo();
     }
+    
+    // If you get 13, trigger the black hole (for testing)
+    if (randomNumber === 13) {
+        showBlackhole();
+    }
+}
+
+// Black hole animation functionality
+const blackholeContainer = document.getElementById('blackholeContainer');
+const blackholeImage = document.getElementById('blackholeImage');
+let blackholeTimer;
+let blackholeMoveInterval;
+let isBlackholeActive = false;
+let blackholeX = 0;
+let blackholeY = 0;
+let suckedElements = [];
+
+// Schedule black hole to appear randomly
+function scheduleBlackhole() {
+    // Random time between 5-20 minutes
+    const minTime = 300000; // 5 minutes
+    const maxTime = 1200000; // 20 minutes
+    const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+    
+    setTimeout(() => {
+        showBlackhole();
+    }, randomTime);
+    
+    console.log(`Black hole scheduled to appear in ${Math.round(randomTime/60000)} minutes`);
+}
+
+// Call this on page load
+scheduleBlackhole();
+
+// Show black hole
+function showBlackhole() {
+    if (isBlackholeActive) return;
+    isBlackholeActive = true;
+    
+    // Set initial position (random)
+    const maxX = window.innerWidth - 200;
+    const maxY = window.innerHeight - 200;
+    blackholeX = Math.random() * maxX;
+    blackholeY = Math.random() * maxY;
+    blackholeContainer.style.left = `${blackholeX}px`;
+    blackholeContainer.style.top = `${blackholeY}px`;
+    
+    // Show container
+    blackholeContainer.style.display = 'block';
+    
+    // Start movement
+    blackholeMoveInterval = setInterval(moveBlackhole, 3000);
+    
+    // Start sucking elements
+    startSuckingElements();
+    
+    // Hide after 30 seconds
+    blackholeTimer = setTimeout(() => {
+        hideBlackhole();
+    }, 30000);
+}
+
+// Move black hole around
+function moveBlackhole() {
+    const maxX = window.innerWidth - 200;
+    const maxY = window.innerHeight - 200;
+    
+    // Generate new position
+    blackholeX = Math.random() * maxX;
+    blackholeY = Math.random() * maxY;
+    
+    // Apply with transition
+    blackholeContainer.style.left = `${blackholeX}px`;
+    blackholeContainer.style.top = `${blackholeY}px`;
+}
+
+// Start sucking elements into the black hole
+function startSuckingElements() {
+    // Elements that can be sucked in
+    const suckableElements = document.querySelectorAll('section, .website-card, .floating-image, h1, h2, h3, p:not(.hold-text)');
+    
+    // Start sucking at random intervals
+    const suckInterval = setInterval(() => {
+        if (!isBlackholeActive) {
+            clearInterval(suckInterval);
+            return;
+        }
+        
+        // Find elements that haven't been sucked yet
+        const availableElements = Array.from(suckableElements).filter(el => 
+            !suckedElements.includes(el) && !el.classList.contains('sucked-in'));
+        
+        // If all elements are sucked, do nothing
+        if (availableElements.length === 0) return;
+        
+        // Select a random element to suck
+        const randomIndex = Math.floor(Math.random() * availableElements.length);
+        const elementToSuck = availableElements[randomIndex];
+        
+        // Add to sucked elements list
+        suckedElements.push(elementToSuck);
+        
+        // Apply sucking effect
+        suckElement(elementToSuck);
+        
+    }, 500); // Try to suck a new element every 500ms
+}
+
+// Apply sucking effect to an element
+function suckElement(element) {
+    // Save original styles for restoration
+    const originalStyles = {
+        position: element.style.position,
+        top: element.style.top,
+        left: element.style.left,
+        width: element.style.width,
+        height: element.style.height,
+        transform: element.style.transform,
+        opacity: element.style.opacity,
+        zIndex: element.style.zIndex
+    };
+    
+    // Store original styles in data attribute
+    element.dataset.originalStyles = JSON.stringify(originalStyles);
+    
+    // Add the sucked-in class
+    element.classList.add('sucked-in');
+    
+    // Apply effects
+    element.style.position = 'fixed';
+    element.style.zIndex = '9700';
+    
+    // Calculate the center of the element
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Apply transition to move to black hole
+    setTimeout(() => {
+        element.style.transform = `translate(${blackholeX + 100 - centerX}px, ${blackholeY + 100 - centerY}px) scale(0.1) rotate(720deg)`;
+        element.style.opacity = '0';
+    }, 50);
+}
+
+// Hide black hole and restore elements
+function hideBlackhole() {
+    if (!isBlackholeActive) return;
+    
+    // Hide the container
+    blackholeContainer.style.display = 'none';
+    
+    // Clear intervals and timers
+    if (blackholeMoveInterval) {
+        clearInterval(blackholeMoveInterval);
+        blackholeMoveInterval = null;
+    }
+    
+    if (blackholeTimer) {
+        clearTimeout(blackholeTimer);
+        blackholeTimer = null;
+    }
+    
+    // Restore all sucked elements
+    restoreSuckedElements();
+    
+    // Reset flags
+    isBlackholeActive = false;
+    suckedElements = [];
+    
+    // Schedule next appearance
+    scheduleBlackhole();
+}
+
+// Restore all elements that were sucked
+function restoreSuckedElements() {
+    document.querySelectorAll('.sucked-in').forEach(element => {
+        // Get original styles
+        let originalStyles = {};
+        try {
+            originalStyles = JSON.parse(element.dataset.originalStyles || '{}');
+        } catch (e) {
+            console.error('Error parsing original styles', e);
+        }
+        
+        // Remove the class
+        element.classList.remove('sucked-in');
+        
+        // Restore original styles with a fade-in effect
+        element.style.transition = 'opacity 1s ease-in';
+        
+        // Apply original positioning
+        element.style.position = originalStyles.position || '';
+        element.style.top = originalStyles.top || '';
+        element.style.left = originalStyles.left || '';
+        element.style.width = originalStyles.width || '';
+        element.style.height = originalStyles.height || '';
+        element.style.transform = originalStyles.transform || '';
+        element.style.zIndex = originalStyles.zIndex || '';
+        
+        // Fade back in
+        setTimeout(() => {
+            element.style.opacity = originalStyles.opacity || '1';
+        }, 50);
+        
+        // Clear the data attribute
+        delete element.dataset.originalStyles;
+    });
 }
 </script>
 </body>
 </html>
+
