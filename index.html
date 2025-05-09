@@ -956,7 +956,14 @@ document.addEventListener('DOMContentLoaded', function() {
     'cat23.jpg': 57500,
     'cat24.jpg': 60000,
     'cat25.jpg': 62500,
-    'cat26.jpg': 90000
+    'cat26.jpg': 90000,
+    'cat27.jpg': 92500,
+    'cat28.jpg': 95000,
+    'cat29.jpg': 155000,
+    'cat30.jpg': 200000,
+    'cat31.jpg': 302500,
+    'cat32.jpg': 405000,
+    'cat33.jpg': 519999
 };
     
     // Cat collection tracking
@@ -1106,10 +1113,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to update coin display
-    function updateCoinDisplay() {
-        document.getElementById('zazu-coin-count').textContent = zazuCoins;
+    // Function to format numbers with K, M, B suffixes
+function formatNumber(num) {
+    if (num < 1000) {
+        return num.toString();
+    } else if (num < 1000000) {
+        return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    } else if (num < 1000000000) {
+        return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    } else {
+        return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
     }
+}
+
+// Function to update coin display with formatted numbers
+function updateCoinDisplay() {
+    document.getElementById('zazu-coin-count').textContent = formatNumber(zazuCoins);
+}
 
     // Function to add coins and show animation
     function addCoins(amount, x, y) {
