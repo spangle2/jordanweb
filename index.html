@@ -1279,10 +1279,13 @@ function updateCoinDisplay() {
             
             // Add click handler for Zazu Coins
             cat.addEventListener('click', function(e) {
-                // Only clickable when active and visible
-                if (cat.dataset.active === 'true') {
+                // Only clickable when active and visible and not already collected
+                if (cat.dataset.active === 'true' && cat.dataset.collected !== 'true') {
                     const catType = catImg.src.split('/').pop(); // Get filename
                     const pointValue = catPointValues[catType] || 1; // Default to 1 if not found
+                    
+                    // Mark as collected to prevent multiple clicks
+                    cat.dataset.collected = 'true';
                     
                     // Add coins at click position
                     addCoins(pointValue, e.clientX, e.clientY);
@@ -1298,6 +1301,8 @@ function updateCoinDisplay() {
                     // Mark as inactive after animation completes
                     setTimeout(() => {
                         cat.dataset.active = 'false';
+                        // Reset collected flag for next appearance
+                        cat.dataset.collected = 'false';
                     }, 600);
                 }
             });
@@ -1359,6 +1364,8 @@ function updateCoinDisplay() {
             // Mark as active and reset active time counter
             selectedCat.dataset.active = 'true';
             selectedCat.dataset.activeTime = '0';
+            // Reset collected flag for new appearance
+            selectedCat.dataset.collected = 'false';
             
             // Slide up animation - ensure it's high enough
             selectedCat.style.transition = 'bottom 1.5s ease-out';
